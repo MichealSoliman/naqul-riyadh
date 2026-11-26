@@ -1,0 +1,87 @@
+# ==========================================================================
+# naqul-riyadh.com - Redirects, canonical host, caching (Apache / LiteSpeed)
+# ==========================================================================
+
+Options -MultiViews -Indexes
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+
+# ---- 1. One canonical host: https + no www ----
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,NE]
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
+
+# ---- 2. /folder/index.html  ->  /folder/ ----
+RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L,NE]
+
+# ---- 3. Add trailing slash to real folders ----
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^(.*[^/])$ /$1/ [R=301,L]
+
+# ---- 4. Old WordPress URLs that changed (manual map) ----
+RewriteRule ^شركة-صيانة-ونقل-العفش-بالرياض/?$ /blog/شركة-صيانة-العفش-بالرياض-0541145506/ [R=301,L]
+RewriteRule ^blog/شركة-صيانة-ونقل-العفش-بالرياض/?$ /blog/شركة-صيانة-العفش-بالرياض-0541145506/ [R=301,L]
+RewriteRule ^شركة-تخزين-اثاث/?$ /شركه-تخزين-عفش-بالرياض/ [R=301,L]
+RewriteRule ^شركة-فك-وتركيب-مكيفات-بالرياض/?$ /شركه-صيانه-و-تنظيف-مكيفات-بالرياض/ [R=301,L]
+RewriteRule ^تنظيف-مكيفات/?$ /شركه-صيانه-و-تنظيف-مكيفات-بالرياض/ [R=301,L]
+RewriteRule ^شركة-مكافحة-حشرات-بالرياض/?$ /شركة-مكافحة-حشرات-بالرياض-2/ [R=301,L]
+RewriteRule ^ورس-لمكافحة-الحشرات-والنمل-الأبيض/?$ /شركة-مكافحة-حشرات-بالرياض-2/ [R=301,L]
+RewriteRule ^(أحدث-)?اسعار-مستودعات-تخزين-اثاث-بالرياض/?$ /blog/أحدث-اسعار-مستودعات-تخزين-اثاث-بالريا/ [R=301,L]
+RewriteRule ^نقل-عفش-العليا-الرياض-0541145506/?$ /blog/نقل-عفش-العليا-الرياض/ [R=301,L]
+RewriteRule ^سيارات-نصف-نقل-لنقل-العفش/?$ /blog/سيارات-نصف-نقل-لنقل-العفش-بالرياض/ [R=301,L]
+RewriteRule ^furniture-moving-in-dhahrat-laban/?$ /blog/دينا-نقل-عفش-حي-ظهرة-لبن/ [R=301,L]
+
+# ---- 5. Old WordPress post URLs  /slug/  ->  /blog/slug/ ----
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/blog/$1/index.html -f
+RewriteRule ^([^/]+)/?$ /blog/$1/ [R=301,L]
+
+# old WordPress embeds / amp / feeds of a post -> the post
+RewriteCond %{DOCUMENT_ROOT}/blog/$1/index.html -f
+RewriteRule ^([^/]+)/(embed|amp|feed)/?$ /blog/$1/ [R=301,L]
+
+# ---- 6. Old WordPress archives ----
+RewriteRule ^category/uncategorized(/.*)?$ /المقالات/ [R=301,L]
+RewriteCond %{DOCUMENT_ROOT}/blog/category/$1/index.html -f
+RewriteRule ^category/([^/]+)/?$ /blog/category/$1/ [R=301,L]
+RewriteCond %{DOCUMENT_ROOT}/المقالات/page/$1/index.html -f
+RewriteRule ^(?:blog/)?page/([0-9]+)/?$ /المقالات/page/$1/ [R=301,L]
+RewriteRule ^blog/?$ /المقالات/ [R=301,L]
+RewriteRule ^(feed|comments/feed)/?$ / [R=301,L]
+RewriteRule ^(wp-admin|wp-login\.php|xmlrpc\.php|wp-json)(/.*)?$ - [G,L]
+</IfModule>
+
+# ---- Compression ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml application/xml text/xml application/manifest+json
+</IfModule>
+
+# ---- Browser caching ----
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType application/xml "access plus 1 day"
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+AddDefaultCharset UTF-8
+AddType application/manifest+json .webmanifest

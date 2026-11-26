@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap Indexing
+Sitemap: https://naqul-riyadh.com/sitemap.xml

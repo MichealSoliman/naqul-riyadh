@@ -1,0 +1,19 @@
+{
+  "name": "شركة نقل الرياض",
+  "short_name": "نقل الرياض",
+  "description": "افضل شركة نقل عفش ومكيفات وتنظيف ومكافحة حشرات بالرياض",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b5cad",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
